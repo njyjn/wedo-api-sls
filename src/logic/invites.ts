@@ -18,6 +18,10 @@ export async function getAllInvites(userId: string, limit?: number, key?: string
     return inviteAccess.getAllInvites(userId, limit, key);
 };
 
+export async function getInvite(userId: string, inviteId: string): Promise<Invite> {
+    return inviteAccess.getInvite(userId, inviteId);
+}
+
 export async function createInvite(userId: string, createInviteRequest: CreateInviteRequest): Promise<Invite> {
     const qrCodeUrlBase = `https://${bucketName}.s3.amazonaws.com`;
     const inviteId = uuidv4().substring(30).toUpperCase();

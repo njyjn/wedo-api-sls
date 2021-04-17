@@ -348,6 +348,39 @@ const serverlessConfiguration: AWS = {
         },
       ]
     },
+    GetInvite: {
+      handler: 'src/lambdas/http/getInvite.handler',
+      events: [
+        {
+          http: {
+            method: 'get',
+            path: 'invites/{inviteId}',
+            cors: true,
+            private: true,
+            authorizer: {
+              name: 'AuthWithCert'
+            },
+          }
+        }
+      ],
+      //@ts-ignore
+      iamRoleStatements: [
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem'
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
+        },
+      ]
+    },
     CreateGuest: {
       handler: 'src/lambdas/http/createGuest.handler',
       events: [

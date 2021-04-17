@@ -41,6 +41,20 @@ export class InviteAccess {
         return [invites, lastEvaluatedKey] ;
     };
 
+    async getInvite(userId: string, inviteId: string): Promise<Invite> {
+        console.log(`Getting invite with id ${inviteId}`);
+
+        const invite = await this.docClient.get({
+            TableName: this.invitesTable,
+            Key: {
+                userId: userId,
+                inviteId: inviteId
+            }
+        }).promise();
+
+        return invite.Item as Invite;
+    };
+
     async createInvite(invite: Invite): Promise<Invite> {
         console.log(`Creating an invite with id ${invite.inviteId}`);
 
