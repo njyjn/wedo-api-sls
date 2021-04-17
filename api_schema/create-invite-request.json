@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "invite",
+    "type": "object",
+    "properties": {
+        "familyName": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "guest",
+                "zoom"
+            ]
+        }
+    },
+    "required": [
+        "familyName",
+        "type"
+    ],
+    "additionalProperties": false
+}

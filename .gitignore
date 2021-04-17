@@ -1,0 +1,23 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Webpack directories
+.webpack
+
+# Local DynamoDb
+.dynamodb
+
+.env.local
+
+shared-local-instance.db
+
+# Temporarily ignored files
+websocket/
+src/lambdas/sns/sendNotifications.ts
+src/lambdas/auth/customAuth.ts
+serverless.draft.ts
+README.md
