@@ -23,6 +23,11 @@ const serverlessConfiguration: AWS = {
           schema: '${file(api_schema/create_invite_request.json)}'
         },
         {
+          name: 'InviteUpdateRequest',
+          contentType: 'application/json',
+          schema: '${file(api_schema/update_invite_request.json)}'
+        },
+        {
           name: 'GuestRequest',
           contentType: 'application/json',
           schema: '${file(api_schema/create_guest_request.json)}'
@@ -186,7 +191,7 @@ const serverlessConfiguration: AWS = {
             },
             request: {
               schema: {
-                'application/json': "${file(models/create-invite-request.json)}"
+                'application/json': "${file(api_schema/create_invite_request.json)}"
               },
             },
             // broken, see https://forum.serverless.com/t/unrecognized-property-documentation/12885
@@ -225,6 +230,54 @@ const serverlessConfiguration: AWS = {
             "Fn::Sub": "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${self:provider.environment.GENERIC_TOPIC_NAME}",
           }
         },  
+      ]
+    },
+    UpdateInvite: {
+      handler: 'src/lambdas/http/updateInvite.handler',
+      events: [
+        {
+          http: {
+            method: 'patch',
+            path: 'invites/{inviteId}',
+            cors: true,
+            private: true,
+            authorizer: {
+              name: 'AuthWithCert'
+            },
+            request: {
+              schema: {
+                'application/json': "${file(api_schema/update_invite_request.json)}"
+              },
+            },
+            // broken, see https://forum.serverless.com/t/unrecognized-property-documentation/12885
+            // @ts-ignore
+            documentation: {
+              summary: 'Update an existing invite',
+              description: 'Update an existing invite',
+              requestModels: {
+                'application/json': 'InviteUpdateRequest'
+              }
+            }
+          }
+        }
+      ],
+      iamRoleStatements: [
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+            'dynamodb:UpdateItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+            'dynamodb:UpdateItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
+        },
       ]
     },
     GetInvites: {
@@ -274,7 +327,7 @@ const serverlessConfiguration: AWS = {
             },
             request: {
               schema: {
-                'application/json': "${file(models/create-guest-request.json)}"
+                'application/json': "${file(api_schema/create_guest_request.json)}"
               },
             },
             // broken, see https://forum.serverless.com/t/unrecognized-property-documentation/12885

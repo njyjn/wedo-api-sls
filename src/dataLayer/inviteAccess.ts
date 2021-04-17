@@ -1,5 +1,6 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { Invite } from 'src/models/Invite';
+import { UpdateInviteRequest } from 'src/requests/UpdateInviteRequest';
 import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
 
@@ -50,6 +51,30 @@ export class InviteAccess {
 
         return invite;
     };
+
+    async updateInvite(userId: string, inviteId: string, inviteItem: UpdateInviteRequest): Promise<any> {
+        console.log(`Editing invite of id ${inviteId}`);
+
+        const invite = await this.docClient.update({
+            TableName: this.invitesTable,
+            Key: {
+                userId: userId,
+                inviteId: inviteId
+            },
+            UpdateExpression: 'SET familyName = :familyName, #T = :inviteType, responded = :responded',
+            ExpressionAttributeValues: {
+                ':familyName': inviteItem.familyName,
+                ':inviteType': inviteItem.type,
+                ':responded': inviteItem.responded
+            },
+            ExpressionAttributeNames: {
+                '#T': 'type'
+            },
+            ReturnValues: 'UPDATED_NEW'
+        }).promise();
+
+        return invite.Attributes;
+    }
 
     async inviteExists(userId: string, inviteId: string): Promise<boolean> {
         const result = await this.docClient.get({

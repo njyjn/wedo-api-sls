@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as QRCode from 'qrcode';
 import axios from 'axios';
 import { DocustoreAccess } from 'src/fsLayer/docustoreAccess';
+import { UpdateInviteRequest } from 'src/requests/UpdateInviteRequest';
 
 const bucketName = process.env.DOCUSTORE_S3_BUCKET;
 
@@ -27,7 +28,12 @@ export async function createInvite(userId: string, createInviteRequest: CreateIn
         familyName: createInviteRequest.familyName,
         type: createInviteRequest.type,
         createTs: new Date().toISOString(),
+        responded: false,
     });
+};
+
+export async function updateInvite(userId: string, inviteId: string, updateInviteRequest: UpdateInviteRequest): Promise<Invite> {
+    return await inviteAccess.updateInvite(userId, inviteId, updateInviteRequest) as Invite;
 };
 
 export async function inviteExists(userId: string, inviteId: string): Promise<boolean> {

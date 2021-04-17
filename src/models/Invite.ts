@@ -5,4 +5,5 @@ export interface Invite {
     type: string,
     qrCodeUrl: string,
     createTs: string,
+    responded: boolean,
 }
