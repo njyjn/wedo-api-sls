@@ -36,6 +36,10 @@ export async function updateInvite(userId: string, inviteId: string, updateInvit
     return await inviteAccess.updateInvite(userId, inviteId, updateInviteRequest) as Invite;
 };
 
+export async function deleteInvite(userId: string, inviteId: string): Promise<void> {
+    return await inviteAccess.deleteInvite(userId, inviteId);
+};
+
 export async function inviteExists(userId: string, inviteId: string): Promise<boolean> {
     return await inviteAccess.inviteExists(userId, inviteId);
 }

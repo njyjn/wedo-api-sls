@@ -280,6 +280,41 @@ const serverlessConfiguration: AWS = {
         },
       ]
     },
+    DeleteInvite: {
+      handler: 'src/lambdas/http/deleteInvite.handler',
+      events: [
+        {
+          http: {
+            method: 'delete',
+            path: 'invites/{inviteId}',
+            cors: true,
+            private: true,
+            authorizer: {
+              name: 'AuthWithCert'
+            },
+          }
+        }
+      ],
+      //@ts-ignore
+      iamRoleStatements: [
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+            'dynamodb:DeleteItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+            'dynamodb:DeleteItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
+        },
+      ]
+    },
     GetInvites: {
       handler: 'src/lambdas/http/getInvites.handler',
       events: [

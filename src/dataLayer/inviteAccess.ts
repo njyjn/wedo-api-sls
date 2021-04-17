@@ -76,6 +76,18 @@ export class InviteAccess {
         return invite.Attributes;
     }
 
+    async deleteInvite(userId: string, inviteId: string): Promise<void> {
+        console.log(`Deleting invite of id ${inviteId}`);
+
+        await this.docClient.delete({
+            TableName: this.invitesTable,
+            Key: {
+                userId: userId,
+                inviteId: inviteId
+            }
+        }).promise();
+    }
+
     async inviteExists(userId: string, inviteId: string): Promise<boolean> {
         const result = await this.docClient.get({
             TableName: this.invitesTable,
