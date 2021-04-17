@@ -205,18 +205,14 @@ const serverlessConfiguration: AWS = {
         {
           Effect: 'Allow',
           Action: [
-            'dynamodb:Scan',
             'dynamodb:PutItem',
-            'dynamodb:GetItem',
           ],
           Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}",
         },
         {
           Effect: 'Allow',
           Action: [
-            'dynamodb:Scan',
             'dynamodb:PutItem',
-            'dynamodb:GetItem',
           ],
           Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
         },
