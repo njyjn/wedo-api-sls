@@ -1,9 +1,8 @@
 # WeDo API
 
-A backend API serving the WeDo application. Client code can be found [here](https://github.com/njyjn/wedo-api-client)
+A backend API serving the WeDo application. Client code can be found [here](https://github.com/njyjn/wedo-client-react)
 
 ![Home page](/images/home_page.png)
-
 
 - [WeDo API](#wedo-api)
   - [Authentication](#authentication)
