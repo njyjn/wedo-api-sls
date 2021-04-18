@@ -36,7 +36,12 @@ const serverlessConfiguration: AWS = {
           name: 'GenerateUploadUrlRequest',
           contentType: 'application/json',
           schema: '${file(api_schema/generate_upload_url_request.json)}'
-        }
+        },
+        {
+          name: 'InviteResponseRequest',
+          contentType: 'application/json',
+          schema: '${file(api_schema/respond_to_invite_request.json)}'
+        },
       ]
     },
     'serverless-offline': {
@@ -275,6 +280,51 @@ const serverlessConfiguration: AWS = {
               description: 'Update an existing invite',
               requestModels: {
                 'application/json': 'InviteUpdateRequest'
+              }
+            }
+          }
+        }
+      ],
+      iamRoleStatements: [
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+            'dynamodb:UpdateItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+            'dynamodb:UpdateItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
+        },
+      ]
+    },
+    RespondToInvite: {
+      handler: 'src/lambdas/http/respondToInvite.handler',
+      events: [
+        {
+          http: {
+            method: 'patch',
+            path: 'invites/{inviteId}/respond',
+            cors: true,
+            private: true,
+            request: {
+              schema: {
+                'application/json': "${file(api_schema/respond_to_invite_request.json)}"
+              },
+            },
+            // broken, see https://forum.serverless.com/t/unrecognized-property-documentation/12885
+            // @ts-ignore
+            documentation: {
+              summary: 'Update response on existing invite',
+              description: 'Update response on existing invite',
+              requestModels: {
+                'application/json': 'InviteResponseRequest'
               }
             }
           }

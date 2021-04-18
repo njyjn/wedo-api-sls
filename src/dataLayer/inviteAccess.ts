@@ -91,6 +91,23 @@ export class InviteAccess {
         return invite.Attributes;
     }
 
+    async respondToInvite(userId: string, inviteId: string, attending: boolean): Promise<void> {
+        console.log(`Updating response on invite of id ${inviteId} with ${attending}`);
+
+        await this.docClient.update({
+            TableName: this.invitesTable,
+            Key: {
+                userId: userId,
+                inviteId: inviteId
+            },
+            UpdateExpression: 'SET responded = :responded, attending = :attending',
+            ExpressionAttributeValues: {
+                ':responded': true,
+                ':attending': attending
+            }
+        }).promise();
+    };
+
     async deleteInvite(userId: string, inviteId: string): Promise<void> {
         console.log(`Deleting invite of id ${inviteId}`);
 

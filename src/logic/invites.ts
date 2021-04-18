@@ -7,6 +7,7 @@ import * as QRCode from 'qrcode';
 import axios from 'axios';
 import { DocustoreAccess } from 'src/fsLayer/docustoreAccess';
 import { UpdateInviteRequest } from 'src/requests/UpdateInviteRequest';
+import { RespondToInviteRequest } from 'src/requests/RespondToInviteRequest';
 
 const bucketName = process.env.DOCUSTORE_S3_BUCKET;
 
@@ -39,6 +40,28 @@ export async function createInvite(userId: string, createInviteRequest: CreateIn
 
 export async function updateInvite(userId: string, inviteId: string, updateInviteRequest: UpdateInviteRequest): Promise<Invite> {
     return await inviteAccess.updateInvite(userId, inviteId, updateInviteRequest) as Invite;
+};
+
+export async function respondToInvite(inviteId: string, respondToInviteRequest: RespondToInviteRequest): Promise<void> {
+    const userId = respondToInviteRequest.orgId;
+    const familyName = respondToInviteRequest.familyName;
+    const attending = respondToInviteRequest.attending;
+    try {
+        // only respond if invite exists, error is thrown if not
+        const invite = await inviteAccess.getInvite(userId, inviteId);
+        // only respond if familyName is supplied correctly
+        if (validateInvite(invite, familyName)) {
+            await inviteAccess.respondToInvite(userId, inviteId, attending);
+        } else {
+            throw new Error();
+        }
+    } catch (e) {
+        throw new Error('The invite ID or family name was incorrect');
+    }
+};
+
+function validateInvite(invite: Invite, familyName: string): boolean {
+    return invite.familyName === familyName
 };
 
 export async function deleteInvite(userId: string, inviteId: string): Promise<void> {
