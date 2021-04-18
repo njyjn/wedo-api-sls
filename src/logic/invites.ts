@@ -49,8 +49,8 @@ export async function inviteExists(userId: string, inviteId: string): Promise<bo
     return await inviteAccess.inviteExists(userId, inviteId);
 }
 
-export async function getUploadUrl(userId: string, id: string) {
-    return await docustoreAccess.getUploadUrl(userId, id, bucketName);
+export async function getUploadUrl(userId: string, id: string, path? :string) {
+    return await docustoreAccess.getUploadUrl(userId, id, bucketName, path);
 }
 
 export async function queueGenerateQrCode(userId: string, inviteId: string): Promise<void> {

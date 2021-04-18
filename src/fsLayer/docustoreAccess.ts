@@ -11,10 +11,11 @@ export class DocustoreAccess {
         private readonly s3Client: AWS.S3 = createS3Client()
     ) {}
 
-    async getUploadUrl(userId: string, inviteId: string, bucketName: string): Promise<string> {
+    async getUploadUrl(userId: string, inviteId: string, bucketName: string, path?: string): Promise<string> {
+        const filepath = path || `invite_qr_codes/${userId}/${inviteId}.png`
         return await this.s3Client.getSignedUrlPromise('putObject', {
             Bucket: bucketName,
-            Key: `invite_qr_codes/${userId}/${inviteId}.png`,
+            Key: filepath,
             Expires: parseInt(signedUrlExpiration),
         });
     };

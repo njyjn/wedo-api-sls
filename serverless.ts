@@ -31,6 +31,11 @@ const serverlessConfiguration: AWS = {
           name: 'GuestRequest',
           contentType: 'application/json',
           schema: '${file(api_schema/create_guest_request.json)}'
+        },
+        {
+          name: 'GenerateUploadUrlRequest',
+          contentType: 'application/json',
+          schema: '${file(api_schema/generate_upload_url_request.json)}'
         }
       ]
     },
@@ -532,6 +537,52 @@ const serverlessConfiguration: AWS = {
             'dynamodb:GetItem',
           ],
           Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
+        },
+      ]
+    },
+    GenerateUploadUrl: {
+      handler: 'src/lambdas/http/generateUploadUrl.handler',
+      events: [
+        {
+          http: {
+            method: 'post',
+            path: 'invites/{inviteId}/attachment',
+            cors: true,
+            private: true,
+            authorizer: {
+              name: 'AuthWithCert'
+            },
+            request: {
+              schema: {
+                'application/json': "${file(api_schema/generate_upload_url_request.json)}"
+              },
+            },
+          }
+        }
+      ],
+      //@ts-ignore
+      iamRoleStatements: [
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem'
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:GetItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            's3:PutObject',
+            's3:GetObject',
+          ],
+          Resource: "arn:aws:s3:::${self:provider.environment.DOCUSTORE_S3_BUCKET}/*",
         },
       ]
     },
