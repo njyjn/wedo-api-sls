@@ -15,12 +15,16 @@
         },
         "responded": {
             "type": "boolean"
+        },
+        "attending": {
+            "type": "boolean"
         }
     },
     "required": [
         "familyName",
         "type",
-        "responded"
+        "responded",
+        "attending"
     ],
     "additionalProperties": false
 }

@@ -75,11 +75,12 @@ export class InviteAccess {
                 userId: userId,
                 inviteId: inviteId
             },
-            UpdateExpression: 'SET familyName = :familyName, #T = :inviteType, responded = :responded',
+            UpdateExpression: 'SET familyName = :familyName, #T = :inviteType, responded = :responded, attending = :attending',
             ExpressionAttributeValues: {
                 ':familyName': inviteItem.familyName,
                 ':inviteType': inviteItem.type,
-                ':responded': inviteItem.responded
+                ':responded': inviteItem.responded,
+                ':attending': inviteItem.attending
             },
             ExpressionAttributeNames: {
                 '#T': 'type'

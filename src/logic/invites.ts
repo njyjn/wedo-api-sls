@@ -33,6 +33,7 @@ export async function createInvite(userId: string, createInviteRequest: CreateIn
         type: createInviteRequest.type,
         createTs: new Date().toISOString(),
         responded: false,
+        attending: false,
     });
 };
 
