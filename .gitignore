@@ -20,4 +20,3 @@ websocket/
 src/lambdas/sns/sendNotifications.ts
 src/lambdas/auth/customAuth.ts
 serverless.draft.ts
-README.md

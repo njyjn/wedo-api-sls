@@ -9,9 +9,6 @@
         },
         "fullName": {
             "type": "string"
-        },
-        "guestId": {
-            "type": "string"
         }
     },
     "required": [
