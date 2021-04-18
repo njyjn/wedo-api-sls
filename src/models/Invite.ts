@@ -6,5 +6,6 @@ export interface Invite {
     qrCodeUrl: string,
     createTs: string,
     responded: boolean,
-    attending: boolean
+    attending: boolean,
+    attachments?: Set<string>,
 }

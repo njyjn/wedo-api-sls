@@ -60,6 +60,14 @@ export async function queueGenerateQrCode(userId: string, inviteId: string): Pro
     });
 }
 
+export async function syncUploadedFileToInvite(key: string): Promise<Invite> {
+    const s3UrlBase = `https://${bucketName}.s3.amazonaws.com`;
+    // Path string like invite_attachments/userId/inviteId/filename.ext
+    const userId = decodeURI(key.split('/')[1]);
+    const inviteId = key.split('/')[2];
+    return await inviteAccess.addAttachmentToInvite(userId, inviteId, `${s3UrlBase}/${key}`);
+}
+
 export async function generateQrCode(inviteId: string, uploadUrl:string): Promise<void> {
     try {
         const buffer = await QRCode.toBuffer(inviteId);

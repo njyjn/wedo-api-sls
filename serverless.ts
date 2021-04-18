@@ -124,7 +124,7 @@ const serverlessConfiguration: AWS = {
       DOCUSTORE_S3_BUCKET: 'wedo-docustore-${self:provider.stage}',
       SIGNED_URL_EXPIRATION: '300',
       GUESTS_ES_INSTANCE: 'wedo-guests-search-${self:provider.stage}',
-      DOCUSTORE_TOPIC_NAME: 'wedo-docustoreTopic-${self:provider.stage}',
+      DOCUSTORE_ATTACHMENTS_TOPIC_NAME: 'wedo-docustoreAttachmentsTopic-${self:provider.stage}',
       GENERIC_TOPIC_NAME: 'wedo-topic-${self:provider.stage}',
       AWS_ACCOUNT_ID: {
         "Fn::Sub": "${AWS::AccountId}"
@@ -586,6 +586,36 @@ const serverlessConfiguration: AWS = {
         },
       ]
     },
+    SyncUploadedFileToInvite: {
+      handler: 'src/lambdas/sns/syncUploadedFileToInvite.handler',
+      events: [
+        {
+          sns: {
+            arn: {
+              "Fn::Sub": "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${self:provider.environment.DOCUSTORE_ATTACHMENTS_TOPIC_NAME}"
+            },
+            topicName: "${self:provider.environment.DOCUSTORE_ATTACHMENTS_TOPIC_NAME}"
+          }
+        }
+      ],
+      //@ts-ignore
+      iamRoleStatements: [
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:UpdateItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:UpdateItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.INVITES_TABLE}/index/${self:provider.environment.INVITES_INDEX}",
+        },
+      ]
+    },
   },
   resources: {
     Resources: {
@@ -688,8 +718,31 @@ const serverlessConfiguration: AWS = {
       },
       DocustoreBucket: {
         Type: 'AWS::S3::Bucket',
+        DependsOn: [
+          'SNSTopicPolicy'
+        ],
         Properties: {
           BucketName: "${self:provider.environment.DOCUSTORE_S3_BUCKET}",
+          NotificationConfiguration: {
+            TopicConfigurations: [
+              {
+                Event: 's3:ObjectCreated:Put',
+                Topic: {
+                  Ref: 'DocustoreAttachmentsTopic'
+                },
+                Filter: {
+                  S3Key: {
+                    Rules: [
+                      {
+                        Name: 'prefix',
+                        Value: 'invite_attachments/'
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
           CorsConfiguration: {
             CorsRules: [
               {
@@ -731,6 +784,43 @@ const serverlessConfiguration: AWS = {
           Bucket: {
             Ref: 'DocustoreBucket'
           }
+        }
+      },
+      SNSTopicPolicy: {
+        Type: 'AWS::SNS::TopicPolicy',
+        Properties: {
+          PolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  AWS: '*'
+                },
+                Action: 'sns:Publish',
+                Resource: {
+                  Ref: 'DocustoreAttachmentsTopic'
+                },
+                Condition: {
+                  ArnLike: {
+                    "AWS:SourceArn": "arn:aws:s3:::${self:provider.environment.DOCUSTORE_S3_BUCKET}"
+                  }
+                }
+              }
+            ]
+          },
+          Topics: [
+            {
+              Ref: 'DocustoreAttachmentsTopic'
+            }
+          ]
+        }
+      },
+      DocustoreAttachmentsTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          DisplayName: 'Docustore bucket topic for attachments',
+          TopicName: "${self:provider.environment.DOCUSTORE_ATTACHMENTS_TOPIC_NAME}",
         }
       },
     }

@@ -114,7 +114,27 @@ export class InviteAccess {
     
         console.log('Get invite: ', result);
         return !!result.Item;
-    }    
+    }
+
+    async addAttachmentToInvite(userId: string, inviteId: string, filepath: string): Promise<Invite> {
+        const invite = await this.docClient.update({
+            TableName: this.invitesTable,
+            Key: {
+                userId: userId,
+                inviteId: inviteId
+            },
+            UpdateExpression: 'ADD #attachments :filepath',
+            ExpressionAttributeNames: {
+                '#attachments': 'attachments'
+            },
+            ExpressionAttributeValues: {
+                ':filepath': this.docClient.createSet([filepath])
+            },
+            ReturnValues: 'UPDATED_NEW'
+        }).promise();
+
+        return invite.Attributes as Invite;
+    }
 };
 
 function createDynamoDbClient() {
