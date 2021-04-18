@@ -1,6 +1,7 @@
 import { Guest } from 'src/models/Guest';
 import { GuestAccess } from 'src/dataLayer/guestAccess';
 import { CreateGuestRequest } from 'src/requests/CreateGuestRequest';
+import { v4 as uuidv4 } from 'uuid';
 
 const guestAccess = new GuestAccess();
 
@@ -16,7 +17,8 @@ export async function createGuest(inviteId: string, createGuestRequest: CreateGu
     return await guestAccess.createGuest({
         inviteId: inviteId,
         fullName: createGuestRequest.fullName,
-        guestId: createGuestRequest.guestId,
+        guestId: uuidv4(),
+        contact: createGuestRequest.contact,
         createTs: new Date().toISOString(),
     } as Guest)
 }

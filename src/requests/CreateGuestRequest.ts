@@ -1,4 +1,4 @@
 export interface CreateGuestRequest {
     fullName: string,
-    guestId: string,
+    contact?: string,
 }

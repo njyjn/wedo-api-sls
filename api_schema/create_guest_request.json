@@ -3,17 +3,19 @@
     "title": "guest",
     "type": "object",
     "properties": {
-        "guestId": {
+        "contact": {
             "type": "string",
             "pattern": "^[EPT]-.+$"
         },
         "fullName": {
             "type": "string"
+        },
+        "guestId": {
+            "type": "string"
         }
     },
     "required": [
-        "fullName",
-        "guestId"
+        "fullName"
     ],
     "additionalProperties": false
 }

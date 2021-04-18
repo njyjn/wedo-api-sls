@@ -229,12 +229,26 @@ const serverlessConfiguration: AWS = {
         {
           Effect: 'Allow',
           Action: [
+            'dynamodb:PutItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GUESTS_TABLE}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
+            'dynamodb:PutItem',
+          ],
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.GUESTS_TABLE}/index/${self:provider.environment.GUESTS_INDEX}",
+        },
+        {
+          Effect: 'Allow',
+          Action: [
             'sns:Publish'
           ],
           Resource: {
             "Fn::Sub": "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${self:provider.environment.GENERIC_TOPIC_NAME}",
           }
-        },  
+        },
       ]
     },
     UpdateInvite: {
@@ -667,7 +681,7 @@ const serverlessConfiguration: AWS = {
               KeyType: 'RANGE'
             }
           ],
-          GlobalSecondaryIndexes: [
+          LocalSecondaryIndexes: [
             {
               IndexName: "${self:provider.environment.INVITES_INDEX}",
               KeySchema: [
@@ -701,6 +715,10 @@ const serverlessConfiguration: AWS = {
               AttributeName: 'guestId',
               AttributeType: 'S'
             },
+            {
+              AttributeName: 'fullName',
+              AttributeType: 'S'
+            },
           ],
           KeySchema: [
             {
@@ -711,6 +729,20 @@ const serverlessConfiguration: AWS = {
               AttributeName: 'guestId',
               KeyType: 'RANGE'
             },
+          ],
+          GlobalSecondaryIndexes: [
+            {
+              IndexName: "${self:provider.environment.GUESTS_INDEX}",
+              KeySchema: [
+                {
+                  AttributeName: 'fullName',
+                  KeyType: 'HASH'
+                }
+              ],
+              Projection: {
+                ProjectionType: 'ALL'
+              }
+            }
           ],
           BillingMode: 'PAY_PER_REQUEST',
           TableName: "${self:provider.environment.GUESTS_TABLE}"

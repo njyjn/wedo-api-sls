@@ -1,5 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from "aws-lambda";
+import { createGuest } from "src/logic/guests";
 import { createInvite, queueGenerateQrCode } from "src/logic/invites";
+import { CreateGuestRequest } from "src/requests/CreateGuestRequest";
 import { CreateInviteRequest } from 'src/requests/CreateInviteRequest'
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -11,14 +13,24 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         const userId = event.requestContext.authorizer.principalId;
         const newInvite: CreateInviteRequest = JSON.parse(event.body);
 
-        // Create record
-        const newItem = await createInvite(
+        // Create invite
+        const invite = await createInvite(
             userId,
             newInvite
         );
 
         // Queue QR code creation
-        await queueGenerateQrCode(userId, newItem.inviteId);
+        await queueGenerateQrCode(userId, invite.inviteId);
+
+        const newGuest = {
+            fullName: invite.familyName,
+        } as CreateGuestRequest;
+
+        // Create primary guest
+        const guest = await createGuest(
+            invite.inviteId,
+            newGuest
+        );
 
         response = {
             statusCode: 201,
@@ -26,7 +38,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
                 'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({
-                newItem: newItem,
+                newItem: invite,
+                primaryGuest: guest,
             }),
         };
     } catch(e) {
